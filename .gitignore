@@ -24,5 +24,7 @@
 /nbdist/
 /.nb-gradle/
 
+.DS_Store
+
 nifi-registry/providers.xml
 /nifi-registry-repo
