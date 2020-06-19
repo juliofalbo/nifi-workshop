@@ -1,0 +1,115 @@
+# https://docs.docker.com/compose/compose-file/
+version: "3.6"
+
+# https://docs.docker.com/compose/compose-file/#networks
+networks:
+  nifi-wkshop:
+
+# https://docs.docker.com/compose/compose-file/#volumes
+volumes:
+  nifi_workshop_mongo:
+  nifi_workshop_nifi_registry_conf:
+  nifi_workshop_nifi_registry_db:
+  nifi_workshop_nifi_registry_docs:
+  nifi_workshop_nifi_registry_ext:
+  nifi_workshop_nifi_registry_extension_bundles:
+  nifi_workshop_nifi_registry_flow_storage:
+  nifi_workshop_nifi_registry_lib:
+  nifi_workshop_nifi_registry_logs:
+  nifi_workshop_nifi_registry_run:
+  nifi_workshop_nifi_registry_work:
+  postgres_data:
+    driver: local
+
+services:
+  mongo-express:
+    # https://hub.docker.com/_/mongo-express/tags
+    image: mongo-express:0.54
+    container_name: 'mongo-express'
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin123
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: root123
+    links:
+      - mongo
+    networks:
+      - "nifi-wkshop"
+  mongo:
+    # https://hub.docker.com/_/mongo/tags
+    image: mongo:4.2.6
+    container_name: 'mongodb'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root123
+    ports:
+      - "27017:27017"
+    volumes:
+      - nifi_workshop_mongo:/data/db
+    networks:
+      - "nifi-wkshop"
+  mongodb-exporter:
+    # https://hub.docker.com/r/bitnami/mongodb-exporter/tags/
+    image: bitnami/mongodb-exporter:0.11.0
+    container_name: 'mongo-exporter'
+    networks:
+      - "nifi-wkshop"
+    ports:
+      - 9216:9216
+    environment:
+      MONGODB_URI: 'mongodb://mongo:27017'
+  rabbitmq:
+    # https://hub.docker.com/r/pivotalrabbitmq/rabbitmq-prometheus/tags
+    image: pivotalrabbitmq/rabbitmq-prometheus:3.9.0-alpha.76-2019.10.30
+    container_name: 'rabbitmq'
+    networks:
+      - "nifi-wkshop"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+      - "15692:15692"
+    cap_add:
+      - ALL
+    hostname: rabbitmq
+    environment:
+      RABBITMQ_ERLANG_COOKIE: rabbitmq
+    volumes:
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./rabbitmq-definitions.json:/etc/rabbitmq/rabbitmq-definitions.json:ro
+  postgres:
+    container_name: postgres
+    image: 'postgres:12'
+    command: postgres -c 'max_connections=500'
+    networks:
+      - "nifi-wkshop"
+    ports:
+      - '5432:5432'
+    volumes:
+      - 'postgres_data:/var/lib/postgresql/data/'
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_HOST_AUTH_METHOD=trust
+  nifi-registry:
+    image: apache/nifi-registry:0.6.0
+    container_name: 'nifi-registry'
+    networks:
+    - "nifi-wkshop"
+    ports:
+      - "18080:18080"
+    volumes:
+      - nifi_workshop_nifi_registry_conf:/opt/nifi-registry/nifi-registry-current/conf
+      - nifi_workshop_nifi_registry_db:/opt/nifi-registry/nifi-registry-current/database
+      - nifi_workshop_nifi_registry_docs:/opt/nifi-registry/nifi-registry-current/docs
+      - nifi_workshop_nifi_registry_ext:/opt/nifi-registry/nifi-registry-current/ext
+      - nifi_workshop_nifi_registry_extension_bundles:/opt/nifi-registry/nifi-registry-current/extension_bundles
+      - nifi_workshop_nifi_registry_flow_storage:/opt/nifi-registry/nifi-registry-current/flow_storage
+      - nifi_workshop_nifi_registry_lib:/opt/nifi-registry/nifi-registry-current/lib
+      - nifi_workshop_nifi_registry_logs:/opt/nifi-registry/nifi-registry-current/logs
+#      - nifi_workshop_nifi_registry_run:/opt/nifi-registry/nifi-registry-current/run
+      - nifi_workshop_nifi_registry_work:/opt/nifi-registry/nifi-registry-current/work
+      - ./nifi-registry-repo:/opt/nifi-registry/nifi-registry-current/git
+      - ./nifi-registry/providers.xml:/opt/nifi-registry/nifi-registry-current/conf/providers.xml

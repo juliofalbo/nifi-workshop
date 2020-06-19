@@ -1,0 +1,74 @@
+# https://docs.docker.com/compose/compose-file/
+version: "3.6"
+
+# https://docs.docker.com/compose/compose-file/#networks
+networks:
+  nifi-wkshop:
+
+# https://docs.docker.com/compose/compose-file/#volumes
+volumes:
+  nifi_workshop_nifi_state:
+  nifi_workshop_nifi_db:
+  nifi_workshop_nifi_flowfile:
+  nifi_workshop_nifi_content:
+  nifi_workshop_nifi_pr:
+  nifi_workshop_nifi_data:
+  nifi_workshop_nifi_conf:
+  nifi_workshop_nifi_logs:
+  nifi_workshop_nifi_state_2:
+  nifi_workshop_nifi_db_2:
+  nifi_workshop_nifi_flowfile_2:
+  nifi_workshop_nifi_content_2:
+  nifi_workshop_nifi_pr_2:
+  nifi_workshop_nifi_data_2:
+  nifi_workshop_nifi_conf_2:
+  nifi_workshop_nifi_logs_2:
+
+services:
+  nifi:
+    # https://hub.docker.com/r/apache/nifi/tags
+    image: apache/nifi:1.11.4
+    networks:
+      - "nifi-wkshop"
+    ports:
+      - "8080:8080"
+      - "9092:9092"
+    environment:
+      - NIFI_VARIABLE_REGISTRY_PROPERTIES=./conf/db.properties
+      - NIFI_REMOTE_INPUT_HOST=nifi
+      - NIFI_REMOTE_INPUT_SOCKET_PORT=8000
+    volumes:
+      - nifi_workshop_nifi_db:/opt/nifi/nifi-current/database_repository
+      - nifi_workshop_nifi_data:/opt/nifi/nifi-current/data
+      - nifi_workshop_nifi_conf:/opt/nifi/nifi-current/conf
+      - nifi_workshop_nifi_logs:/opt/nifi/nifi-current/logs
+      - nifi_workshop_nifi_flowfile:/opt/nifi/nifi-current/flowfile_repository
+      - nifi_workshop_nifi_state:/opt/nifi/nifi-current/state
+      - nifi_workshop_nifi_content:/opt/nifi/nifi-current/content_repository
+      - nifi_workshop_nifi_pr:/opt/nifi/nifi-current/provenance_repository
+      - ./postgres/postgresql-42.2.14.jar:/opt/nifi/nifi-current/lib/postgresql-42.2.14.jar
+      - ./postgres/db.properties:/opt/nifi/nifi-current/conf/db.properties
+  nifitwo:
+    # https://hub.docker.com/r/apache/nifi/tags
+    image: apache/nifi:1.11.4
+    container_name: "nifitwo"
+    networks:
+      - "nifi-wkshop"
+    ports:
+      - "8089:8080"
+      - "9099:9092"
+    environment:
+      - NIFI_VARIABLE_REGISTRY_PROPERTIES=./conf/db.properties
+      - NIFI_REMOTE_INPUT_HOST=nifitwo
+      - NIFI_REMOTE_INPUT_SOCKET_PORT=8001
+    volumes:
+      - nifi_workshop_nifi_db_2:/opt/nifi/nifi-current/database_repository
+      - nifi_workshop_nifi_data_2:/opt/nifi/nifi-current/data
+      - nifi_workshop_nifi_conf_2:/opt/nifi/nifi-current/conf
+      - nifi_workshop_nifi_logs_2:/opt/nifi/nifi-current/logs
+      - nifi_workshop_nifi_flowfile_2:/opt/nifi/nifi-current/flowfile_repository
+      - nifi_workshop_nifi_state_2:/opt/nifi/nifi-current/state
+      - nifi_workshop_nifi_content_2:/opt/nifi/nifi-current/content_repository
+      - nifi_workshop_nifi_pr_2:/opt/nifi/nifi-current/provenance_repository
+      - ./postgres/postgresql-42.2.14.jar:/opt/nifi/nifi-current/lib/postgresql-42.2.14.jar
+      - ./postgres/db.properties:/opt/nifi/nifi-current/conf/db.properties

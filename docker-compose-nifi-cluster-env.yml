@@ -1,0 +1,35 @@
+# https://docs.docker.com/compose/compose-file/
+version: "3.6"
+
+# https://docs.docker.com/compose/compose-file/#networks
+networks:
+  nifi-wkshop:
+
+services:
+  zookeeper:
+    # https://hub.docker.com/r/bitnami/zookeeper/tags
+    image: bitnami/zookeeper:3.6.1
+    networks:
+      - "nifi-wkshop"
+    hostname: zookeeper
+    container_name: 'zookeeper'
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+  zookeeper-exporter:
+    image: dabealu/zookeeper-exporter
+    container_name: 'zookeeper-exporter'
+    ports:
+      - "8083:8080"
+    networks:
+      - "nifi-wkshop"
+    command: --zk-host=zookeeper --timeout=5
+  nginx:
+    container_name: nginx
+    image: nginx:1.17
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8080:8080"
+      - "9092:9092"
+    networks:
+      - "nifi-wkshop"

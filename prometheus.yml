@@ -1,0 +1,25 @@
+# https://prometheus.io/docs/prometheus/latest/configuration/configuration/
+global:
+  scrape_interval: 15s # Default is every 1 minute.
+
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+  - job_name: 'zookeeper'
+    static_configs:
+      - targets: ['zookeeper-exporter:8080']
+  - job_name: 'mongo'
+    static_configs:
+      - targets: ['mongodb-exporter:9216']
+  - job_name: 'rabbitmq'
+    static_configs:
+      - targets:
+          - 'rabbitmq:15692'
+  - job_name: 'instances-service-discovery'
+    metrics_path: '/metrics'
+    file_sd_configs:
+      - files:
+          - targets.json
+        refresh_interval: 5s
