@@ -1,9 +1,0 @@
-[
-  {
-    "targets": [ "host.docker.internal:9092" ],
-    "labels": {
-      "env": "local",
-      "job": "instances_nifi"
-    }
-  }
-]

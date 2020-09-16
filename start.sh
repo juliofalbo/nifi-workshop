@@ -24,43 +24,46 @@ function print_cyan() {
     echo -e "${LIGHT_CYAN}$1${NOCOLOR}"
 }
 
+# Name of the script
+SCRIPT=$( basename "$0" )
 
-print_cyan "Starting the Environment SetUp";
-print_cyan "- Grafana";
-print_cyan "- Prometheus";
-print_cyan "- RabbitMQ";
-print_cyan "- Mongo";
-print_cyan "- Mongo Express";
-print_cyan "- Postgres";
-print_cyan "- NiFi";
-print_cyan "- Zookeeper";
+# Current version
+VERSION="1.0.0"
 
-docker-compose -f "$BASEDIR/docker-compose-services.yml" up -d;
+#
+# Message to display for usage and help.
+#
+function usage
+{
+    local txt=(
+"Utility $SCRIPT for doing stuff."
+"Usage: $SCRIPT [options] <command> [arguments]"
+""
+"Commands:"
+"  all             nifi-workshop-cli start all - It will start all apps and monitoring"
+"  monitoring      nifi-workshop-cli start monitoring - It will start only monitoring env (Grafana and Prometheus)"
+"  nifi            nifi-workshop-cli start nifi - It will start only NiFi"
+"- Note: You can combine commands like: mpdocker start db -r issp --scale-issp 5 swift -sswift 3"
+"- Note: Since we have a service discovery strategy for our services, remember to start the monitoring always in the final like: mpdocker start db -r issp --scale-issp 5 swift -sswift 3 monitoring"
+""
+""
+"Options:"
+"  --help, -h                Print help."
+"  --version, -v             Print version."
+"  --cluster, -c             It will start NiFi in a cluster mode and you must inform how many instances of NiFi will run in a cluster"
+    )
 
-if [[ "$BUILD" = '--cluster' ]] ; then
-    print_cyan "Starting NIFI in a Cluster"
-    docker-compose -f "$BASEDIR/docker-compose-nifi-cluster-env.yml" up -d;
-    INSTANCES_SCALE=$(getScaleArgumentValue "$@");
-    docker-compose -f "$BASEDIR/docker-compose-nifi-cluster.yml" up -d --scale nifi="$INSTANCES_SCALE";
-else
-    print_cyan "Starting NIFI in a Single Node"
-    docker-compose -f "$BASEDIR/docker-compose-nifi-two-standalone.yml" up -d;
-fi
+    printf "%s\n" "${txt[@]}"
+}
 
-
-#https://github.com/juliofalbo/docker-compose-prometheus-service-discovery
-"$HOME/workspace/docker-compose-prometheus-service-discovery/docker-prmt-serv-disc.sh" start -f "/Users/jfa/workspace/nifi-workshop/docker-prometheus-sd.yml"
-
-#Remember to run the Docker Compose Prometheus Service Discovery (https://github.com/juliofalbo/docker-compose-prometheus-service-discovery)
-"$BASEDIR/waitFile.sh" 1 "$BASEDIR/targets.json" 'targets'
-
-print_cyan "Waiting NiFi";
-
-docker-compose -f "$BASEDIR/docker-compose-monitoring.yml" up -d;
-
-"$BASEDIR/waitHttp.sh" 10 http://localhost:8080/nifi
-
-print_green "All environment is running!";
+#
+# Message to display for version.
+#
+function version
+{
+    local txt=("$SCRIPT version $VERSION")
+    printf "%s\n" "${txt[@]}"
+}
 
 #
 # Method responsible to return the NIFI scale value.
@@ -73,10 +76,117 @@ function getScaleArgumentValue {
   do
     SCALE_COUNTER=$((SCALE_COUNTER+1));
     case "$setUpArgument" in
-        --scale | -s)
+        --cluster | -c)
           SCALE_VALUE=("${@:$SCALE_COUNTER+1}");
         ;;
     esac
   done
-  echo "${SCALE_VALUE[0]}";
+  if [[ ${SCALE_VALUE[0]} ]] ; then
+    echo "${SCALE_VALUE[0]}";
+  else
+    echo 1;
+  fi
+
 }
+
+#
+# Method responsible to check if NIFI will run in cluster mode
+#
+function getClusterArgumentValue {
+  CLUSTER_VALUE=1;
+  for setUpArgument in "$@"
+  do
+    case "$setUpArgument" in
+        --cluster | -c)
+          CLUSTER_VALUE=0;
+        ;;
+    esac
+  done
+  echo "$CLUSTER_VALUE";
+}
+
+#
+# Function responsible to set-up all environment
+#
+function setup-all
+{
+  print_blue "Starting the complete NiFi Workshop with Monitoring Environment";
+
+  docker-compose -f "$BASEDIR/docker-compose-services.yml" up -d;
+  setup-nifi "$@"
+  setup-monitoring "$@"
+
+  print_cyan "Waiting NiFi";
+  "$BASEDIR/waitHttp.sh" 10 http://localhost:8080/nifi
+
+  print_green "NiFi Workshop Environment is up and running";
+  echo;
+}
+
+#
+# Function responsible to set-up only NiFi
+#
+function setup-nifi
+{
+  CLUSTER=$(getClusterArgumentValue "$@");
+  if [[ "$CLUSTER" == 0 ]] ; then
+      print_cyan "Starting NIFI in a Cluster"
+      docker-compose -f "$BASEDIR/docker-compose-nifi-cluster-env.yml" up -d;
+      INSTANCES_SCALE=$(getScaleArgumentValue "$@");
+      docker-compose -f "$BASEDIR/docker-compose-nifi-cluster.yml" up -d --scale nifi="$INSTANCES_SCALE";
+  else
+      print_cyan "Starting NIFI with two Single Applications"
+      docker-compose -f "$BASEDIR/docker-compose-nifi-two-standalone.yml" up -d;
+  fi
+}
+
+#
+# Function responsible to set-up only Monitoring Env
+#
+function setup-monitoring
+{
+  CLUSTER=$(getClusterArgumentValue "$@");
+  if [[ "$CLUSTER" == 0 ]] ; then
+    #https://github.com/juliofalbo/docker-compose-prometheus-service-discovery
+    "$HOME/workspace/docker-compose-prometheus-service-discovery/docker-prmt-serv-disc.sh" start -f "/Users/jfa/workspace/nifi-workshop/docker-prometheus-sd.yml"
+    #Remember to run the Docker Compose Prometheus Service Discovery (https://github.com/juliofalbo/docker-compose-prometheus-service-discovery)
+    "$BASEDIR/waitFile.sh" 1 "$BASEDIR/targets.json" 'targets'
+  fi
+
+  docker-compose -f "$BASEDIR/docker-compose-monitoring.yml" up -d;
+}
+
+#
+# Process options
+#
+#print_banner;
+for argument in "$@"
+do
+    case "$argument" in
+
+        --help | -h)
+            usage
+            exit 0
+        ;;
+
+        --version | -v)
+            version
+            exit 0
+        ;;
+
+        all)
+            setup-all "$@"
+            exit 0
+        ;;
+
+        nifi          \
+        | cluster-env \
+        | monitoring)
+            shift
+            "setup-$argument" "$@"
+        ;;
+
+    esac
+done
+
+exit 0

@@ -1,7 +1,4 @@
-CREATE DATABASE nifi;
-USE nifi;
-
-create table person (
+CREATE TABLE person (
 	id INT,
 	first_name VARCHAR(50),
 	last_name VARCHAR(50),
