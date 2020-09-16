@@ -36,16 +36,15 @@ VERSION="1.0.0"
 function usage
 {
     local txt=(
-"Utility $SCRIPT for doing stuff."
+"Utility $SCRIPT for start the NiFi Environment of Apache NiFi."
 "Usage: $SCRIPT [options] <command> [arguments]"
 ""
 "Commands:"
-"  all             nifi-workshop-cli start all - It will start all apps and monitoring"
-"  monitoring      nifi-workshop-cli start monitoring - It will start only monitoring env (Grafana and Prometheus)"
-"  nifi            nifi-workshop-cli start nifi - It will start only NiFi"
-"- Note: You can combine commands like: mpdocker start db -r issp --scale-issp 5 swift -sswift 3"
-"- Note: Since we have a service discovery strategy for our services, remember to start the monitoring always in the final like: mpdocker start db -r issp --scale-issp 5 swift -sswift 3 monitoring"
-""
+"  all             ./cli.sh start all        - It will start all apps and monitoring"
+"  monitoring      ./cli.sh start monitoring - It will start only monitoring env (Grafana and Prometheus)"
+"  nifi            ./cli.sh start nifi        - It will start only NiFi"
+"  services        ./cli.sh start services    - It will start services for the Apache NiFi environment"
+"- Note: You can combine commands like: ./cli.sh start nifi monitoring"
 ""
 "Options:"
 "  --help, -h                Print help."
@@ -110,16 +109,16 @@ function getClusterArgumentValue {
 #
 function setup-all
 {
-  print_blue "Starting the complete NiFi Workshop with Monitoring Environment";
+  print_blue "Starting the complete Apache NiFi with Monitoring Environment";
 
-  docker-compose -f "$BASEDIR/docker-compose-services.yml" up -d;
+  setup-services "$@"
   setup-nifi "$@"
   setup-monitoring "$@"
 
   print_cyan "Waiting NiFi";
   "$BASEDIR/waitHttp.sh" 10 http://localhost:8080/nifi
 
-  print_green "NiFi Workshop Environment is up and running";
+  print_green "Apache NiFi Environment is up and running";
   echo;
 }
 
@@ -138,6 +137,15 @@ function setup-nifi
       print_cyan "Starting NIFI with two Single Applications"
       docker-compose -f "$BASEDIR/docker-compose-nifi-two-standalone.yml" up -d;
   fi
+}
+
+#
+# Function responsible to set-up only the Services
+#
+function setup-services
+{
+  print_cyan "Starting all Services of the Apache NiFi Environment"
+  docker-compose -f "$BASEDIR/docker-compose-services.yml" up -d;
 }
 
 #

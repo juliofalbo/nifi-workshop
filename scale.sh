@@ -36,11 +36,11 @@ VERSION="1.0.0"
 function usage
 {
     local txt=(
-"Utility $SCRIPT for scale NiFi in a cluster."
+"Utility $SCRIPT for scale Apache NiFi instances in a cluster."
 "Usage: $SCRIPT [options] <command> [arguments]"
 ""
 "Commands:"
-"  nifi            nifi-workshop scale nifi <NUMBER_OF_INSTANCES> - It will scale NIFI's containers"
+"  nifi            ./cli.sh scale nifi <NUMBER_OF_INSTANCES> - It will scale NIFI's containers"
 ""
 ""
 "Options:"
