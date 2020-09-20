@@ -92,6 +92,22 @@ function setup-start
 }
 
 #
+# Function responsible to see the logs of the containers of the env
+#
+function setup-logs
+{
+  "$BASEDIR/logs.sh" "$@"
+}
+
+#
+# Function responsible to enter in the containers of the env
+#
+function setup-bash
+{
+  "$BASEDIR/bash.sh" "$@"
+}
+
+#
 # Function responsible to stop the env
 #
 function setup-stop
@@ -119,6 +135,8 @@ do
 
         scale         \
         | start       \
+        | logs       \
+        | bash       \
         | stop)
 
         shift
