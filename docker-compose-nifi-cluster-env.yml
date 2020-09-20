@@ -12,17 +12,13 @@ services:
     networks:
       - "nifi-wkshop"
     hostname: zookeeper
+    ports:
+      - "8084:8084"
     container_name: 'zookeeper'
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
-  zookeeper-exporter:
-    image: dabealu/zookeeper-exporter
-    container_name: 'zookeeper-exporter'
-    ports:
-      - "8083:8080"
-    networks:
-      - "nifi-wkshop"
-    command: --zk-host=zookeeper --timeout=5
+      - ZOO_ENABLE_PROMETHEUS_METRICS=true
+      - ZOO_PROMETHEUS_METRICS_PORT_NUMBER=8084
   nginx:
     container_name: nginx
     image: nginx:1.17

@@ -69,6 +69,7 @@ function stop-all() {
   stop-services "$@"
   stop-monitoring "$@"
   stop-nifi "$@"
+  stop-services "$@"
   echo
 }
 
@@ -110,6 +111,8 @@ function stop-services() {
   if [ "$REMOVE_VOLUME" == 0 ]; then
     print_red "Stopping all Services removing volumes"
     docker-compose -f "$BASEDIR/docker-compose-services.yml" down -v
+    docker-compose -f "$BASEDIR/docker-compose-services.yml" down -v
+    docker-compose -f "$BASEDIR/docker-compose-nifi-cluster-env.yml" down -v
     docker-compose -f "$BASEDIR/docker-compose-nifi-cluster-env.yml" down -v
   else
     print_red "Stopping all Services keeping volumes"

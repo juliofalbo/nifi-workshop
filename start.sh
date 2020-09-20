@@ -83,7 +83,7 @@ function getScaleArgumentValue {
   if [[ ${SCALE_VALUE[0]} ]] ; then
     echo "${SCALE_VALUE[0]}";
   else
-    echo 1;
+    echo 2;
   fi
 
 }
@@ -115,9 +115,6 @@ function setup-all
   setup-nifi "$@"
   setup-monitoring "$@"
 
-  print_cyan "Waiting NiFi";
-  "$BASEDIR/waitHttp.sh" 10 http://localhost:8080/nifi
-
   print_green "Apache NiFi Environment is up and running";
   echo;
 }
@@ -133,9 +130,16 @@ function setup-nifi
       docker-compose -f "$BASEDIR/docker-compose-nifi-cluster-env.yml" up -d;
       INSTANCES_SCALE=$(getScaleArgumentValue "$@");
       docker-compose -f "$BASEDIR/docker-compose-nifi-cluster.yml" up -d --scale nifi="$INSTANCES_SCALE";
+
+      print_cyan "Waiting NiFi";
+      "$BASEDIR/waitHttp.sh" 10 http://localhost:8080/nifi
   else
       print_cyan "Starting NIFI with two Single Applications"
       docker-compose -f "$BASEDIR/docker-compose-nifi-two-standalone.yml" up -d;
+
+      print_cyan "Waiting NiFi";
+      "$BASEDIR/waitHttp.sh" 10 http://localhost:8080/nifi
+      "$BASEDIR/waitHttp.sh" 10 http://localhost:8089/nifi
   fi
 }
 

@@ -9,7 +9,7 @@ scrape_configs:
       - targets: ['localhost:9090']
   - job_name: 'zookeeper'
     static_configs:
-      - targets: ['zookeeper-exporter:8080']
+      - targets: ['zookeeper:8084']
   - job_name: 'mongo'
     static_configs:
       - targets: ['mongodb-exporter:9216']

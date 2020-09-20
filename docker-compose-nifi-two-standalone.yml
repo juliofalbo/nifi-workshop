@@ -27,7 +27,7 @@ volumes:
 services:
   nifi:
     # https://hub.docker.com/r/apache/nifi/tags
-    image: apache/nifi:1.11.4
+    image: apache/nifi:1.12.0
     container_name: "nifi"
     networks:
       - "nifi-wkshop"
@@ -55,7 +55,7 @@ services:
       - ./nifi/libs/http-builder-0.7.1.jar:/opt/nifi/nifi-current/lib/http-builder-0.7.1.jar
   nifitwo:
     # https://hub.docker.com/r/apache/nifi/tags
-    image: apache/nifi:1.11.4
+    image: apache/nifi:1.12.0
     container_name: "nifitwo"
     networks:
       - "nifi-wkshop"

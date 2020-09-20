@@ -36,13 +36,13 @@ VERSION="1.0.0"
 function usage
 {
     local txt=(
-"Utility $SCRIPT for scale NiFi in a cluster."
+"Utility $SCRIPT for handle the NiFi environment."
 "Usage: $SCRIPT [options] <command> [arguments]"
 ""
 "Commands:"
-"  scale            nifi-workshop-cli scale <SERVICE> <NUMBER_OF_INSTANCES> - It will scale containers of available servers"
-"  start            nifi-workshop-cli start - It will start the NiFi Workshop environment"
-"  stop             nifi-workshop-cli stop - It will start the NiFi Workshop environment"
+"  scale            ./cli.sh scale <SERVICE> <NUMBER_OF_INSTANCES> - It will scale containers of available servers"
+"  start            ./cli.sh start                                 - It will start the NiFi environment"
+"  stop             ./cli.sh stop                                  - It will start the NiFi environment"
 ""
 ""
 "Options:"
@@ -64,10 +64,13 @@ function version
 
 function print_banner
 {
-   print_cyan "__      ___  _____ _  _ ___   _  _ ___ ___ ___    ___ _    ___  "
-   print_cyan "\ \    / / |/ / __| || | _ \ | \| |_ _| __|_ _|  / __| |  |_ _| "
-   print_cyan " \ \/\/ /| ' <\__ \ __ |  _/ | .\` || || _| | |  | (__| |__ | | "
-   print_cyan "  \_/\_/ |_|\_\___/_||_|_|   |_|\_|___|_| |___|  \___|____|___| "
+print_cyan "
+      _ _____   _   _ ___ _____ ___    ____ _     ___
+     | |  ___| | \ | |_ _|  ___|_ _|  / ___| |   |_ _|
+  _  | | |_    |  \| || || |_   | |  | |   | |    | |
+ | |_| |  _|   | |\  || ||  _|  | |  | |___| |___ | |
+  \___/|_|     |_| \_|___|_|   |___|  \____|_____|___|
+"
 
   echo
 }
@@ -99,7 +102,7 @@ function setup-stop
 #
 # Process options
 #
-#print_banner;
+print_banner;
 for argument in "$@"
 do
     case "$argument" in

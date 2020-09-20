@@ -66,7 +66,7 @@ function version
 function scale-nifi
 {
   print_cyan "Scaling NIFI for $1 instances"
-  "$BASEDIR/start.sh" --cluster "$1"
+  "$BASEDIR/start.sh" nifi --cluster "$1"
 }
 
 #
