@@ -16,8 +16,9 @@
  */
 package com.julio.processors.custom;
 
-import org.apache.nifi.flowfile.FlowFile;
-import org.apache.nifi.util.FlowFileValidator;
+import com.julio.customservice.MyService;
+import com.julio.customservice.StandardMyService;
+import org.apache.nifi.reporting.InitializationException;
 import org.apache.nifi.util.MockFlowFile;
 import org.apache.nifi.util.TestRunner;
 import org.apache.nifi.util.TestRunners;
@@ -43,11 +44,11 @@ public class MyProcessorTest {
     }
 
     @Test
-    public void processorShouldWorkFine() throws FileNotFoundException {
+    public void processorShouldWorkFine() throws FileNotFoundException, InitializationException {
 
         final String filename = "firstTest.json";
         MockFlowFile flowFile = testRunner.enqueue(new FileInputStream(new File("src/test/resources/" + filename)));
-        Map<String, String> attrs = new HashMap<>() {
+        Map<String, String> attrs = new HashMap<String, String>() {
             {
                 put("filename", filename);
             }
@@ -57,6 +58,7 @@ public class MyProcessorTest {
         testRunner.setValidateExpressionUsage(false);
         testRunner.setProperty(MyProcessor.TAGS_STARTING_WITH, "l");
 
+        configureCustomControllerService();
 
         testRunner.assertValid();
         testRunner.run();
@@ -72,7 +74,7 @@ public class MyProcessorTest {
     }
 
     @Test
-    public void flowfileShouldGoToFailedRelDueNoTags() throws FileNotFoundException {
+    public void flowfileShouldGoToFailedRelDueNoTags() throws FileNotFoundException, InitializationException {
 
         final String filename = "noTags.json";
         MockFlowFile flowFile = testRunner.enqueue(new FileInputStream(new File("src/test/resources/" + filename)));
@@ -86,6 +88,7 @@ public class MyProcessorTest {
         testRunner.setValidateExpressionUsage(false);
         testRunner.setProperty(MyProcessor.TAGS_STARTING_WITH, "l");
 
+        configureCustomControllerService();
 
         testRunner.assertValid();
         testRunner.run();
@@ -98,7 +101,7 @@ public class MyProcessorTest {
     }
 
     @Test
-    public void flowfileShouldGoToFailedRelDueInvalidFormat() throws FileNotFoundException {
+    public void flowfileShouldGoToFailedRelDueInvalidFormat() throws FileNotFoundException, InitializationException {
 
         final String filename = "invalid.json";
         MockFlowFile flowFile = testRunner.enqueue(new FileInputStream(new File("src/test/resources/" + filename)));
@@ -112,6 +115,7 @@ public class MyProcessorTest {
         testRunner.setValidateExpressionUsage(false);
         testRunner.setProperty(MyProcessor.TAGS_STARTING_WITH, "l");
 
+        configureCustomControllerService();
 
         testRunner.assertValid();
         testRunner.run();
@@ -121,6 +125,14 @@ public class MyProcessorTest {
             Assert.assertNotNull(f.getAttribute("treated"));
             Assert.assertEquals("false", f.getAttribute("treated"));
         });
+    }
+
+    private void configureCustomControllerService() throws InitializationException {
+        final StandardMyService service = new StandardMyService();
+        testRunner.addControllerService("SECRET_TOKEN_SERVICE", service);
+        testRunner.setProperty(service, StandardMyService.TOKEN, MyProcessor.TOKEN);
+        testRunner.enableControllerService(service);
+        testRunner.setProperty(MyProcessor.SECRET_TOKEN_SERVICE, "SECRET_TOKEN_SERVICE");
     }
 
 }

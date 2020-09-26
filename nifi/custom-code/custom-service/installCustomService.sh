@@ -7,3 +7,4 @@ cd "$BASEDIR/CustomService" || exit;
 mvn clean install
 
 cp "$BASEDIR/CustomService/nifi-customservice-nar/target/nifi-customservice-nar-1.0.nar" "$BASEDIR/../../libs"
+cp "$BASEDIR/CustomService/nifi-customservice-api-nar/target/nifi-customservice-api-nar-1.0.nar" "$BASEDIR/../../libs"

@@ -16,7 +16,6 @@
  */
 package com.julio.processors.custom;
 
-import com.julio.customservice.MyService;
 import com.julio.customservice.StandardMyService;
 import org.apache.nifi.annotation.behavior.ReadsAttribute;
 import org.apache.nifi.annotation.behavior.ReadsAttributes;
@@ -27,12 +26,13 @@ import org.apache.nifi.annotation.documentation.SeeAlso;
 import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.annotation.lifecycle.OnScheduled;
 import org.apache.nifi.components.PropertyDescriptor;
+import org.apache.nifi.components.ValidationContext;
+import org.apache.nifi.components.ValidationResult;
 import org.apache.nifi.expression.ExpressionLanguageScope;
 import org.apache.nifi.flowfile.FlowFile;
 import org.apache.nifi.processor.*;
 import org.apache.nifi.processor.exception.ProcessException;
 import org.apache.nifi.processor.util.StandardValidators;
-import org.apache.nifi.serialization.RecordSetWriterFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -40,6 +40,7 @@ import org.json.simple.parser.ParseException;
 
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidParameterException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -80,6 +81,8 @@ public class MyProcessor extends AbstractProcessor {
         .description("FlowFile was processed unsuccessfully")
         .build();
 
+    protected static String TOKEN = "nifitoken";
+
     private List<PropertyDescriptor> descriptors;
 
     private Set<Relationship> relationships;
@@ -115,6 +118,25 @@ public class MyProcessor extends AbstractProcessor {
 
     }
 
+    @Override
+    protected Collection<ValidationResult> customValidate(ValidationContext validationContext) {
+        final StandardMyService secretTokenService = validationContext.getProperty(SECRET_TOKEN_SERVICE)
+                                                                      .asControllerService(StandardMyService.class);
+
+
+        List<ValidationResult> results = new ArrayList<>(super.customValidate(validationContext));
+
+        if (!isValidToken(secretTokenService)) {
+            results.add(new ValidationResult.Builder()
+                            .subject("Invalid Token")
+                            .valid(false)
+                            .explanation("Invalid Token")
+                            .build());
+        }
+
+        return results;
+    }
+
     //This method will be called every time that a new FlowFill reach the Processor
     @Override
     public void onTrigger(final ProcessContext context, final ProcessSession session) throws ProcessException {
@@ -122,8 +144,6 @@ public class MyProcessor extends AbstractProcessor {
         if (flowFile == null) {
             return;
         }
-
-        final StandardMyService secretTokenService = context.getProperty(SECRET_TOKEN_SERVICE).asControllerService(StandardMyService.class);
 
         try {
             AtomicReference<String> errorMessage = new AtomicReference<>("");
@@ -154,7 +174,8 @@ public class MyProcessor extends AbstractProcessor {
                 }
             });
 
-            if (!errorMessage.get().isEmpty()) {
+            if (!errorMessage.get()
+                             .isEmpty()) {
                 throw new RuntimeException(errorMessage.get());
             } else {
                 flowFile = newFlowFile;
@@ -165,11 +186,23 @@ public class MyProcessor extends AbstractProcessor {
         } catch (Exception ex) {
             flowFile = session.putAttribute(flowFile, "treated", "false");
             String message = ex.getMessage();
-            if(message == null){
-                message = ex.getClass().getName();
+            if (message == null) {
+                message = ex.getClass()
+                            .getName();
             }
             flowFile = session.putAttribute(flowFile, "error.message", message);
             session.transfer(flowFile, REL_FAILURE);
         }
+    }
+
+    private boolean isValidToken(StandardMyService secretTokenService) {
+        if (secretTokenService.getToken() == null
+            || secretTokenService.getToken()
+                                 .isEmpty()
+            || !TOKEN.equals(secretTokenService.getToken())) {
+            return false;
+        }
+
+        return true;
     }
 }

@@ -19,6 +19,9 @@ volumes:
   nifi_workshop_nifi_registry_logs:
   nifi_workshop_nifi_registry_run:
   nifi_workshop_nifi_registry_work:
+  nifi_workshop_nifi_logs:
+  nifi_workshop_nifi_logs_2:
+  solr_data:
   postgres_data:
     driver: local
 
@@ -129,18 +132,14 @@ services:
       - SPLUNK_PASSWORD=password
     ports:
       - "8000:8000"
-  splunkforwarder:
-    image: splunk/universalforwarder:8.0
-    hostname: splunkforwarder
-    container_name: splunkforwarder
-    environment:
-      - SPLUNK_START_ARGS=--accept-license --answer-yes
-      - SPLUNK_STANDALONE_URL=splunk:9997
-      - SPLUNK_USER=root
-      - SPLUNK_ADD=monitor /opt/nifi/nifi-current/logs
-      - SPLUNK_PASSWORD=password
-    restart: always
-    depends_on:
-      - splunk
+  solr:
+    image: solr:8.6
+    container_name: solr
+    ports:
+      - "8983:8983"
     volumes:
-      - log_volume_splunk:/opt/nifi/nifi-current/logs
+      - solr_data:/var/slr
+    entrypoint:
+      - bash
+      - "-c"
+      - "precreate-core nifi-core; exec solr -f"

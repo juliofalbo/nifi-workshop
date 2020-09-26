@@ -5,6 +5,9 @@ version: "3.6"
 networks:
   nifi-wkshop:
 
+volumes:
+  log_volume_splunk:
+
 services:
   zookeeper:
     # https://hub.docker.com/r/bitnami/zookeeper/tags
@@ -29,3 +32,15 @@ services:
       - "9092:9092"
     networks:
       - "nifi-wkshop"
+  splunkforwarder:
+    image: splunk/universalforwarder:8.0
+    hostname: splunkforwarder-cluster
+    environment:
+      - SPLUNK_START_ARGS=--accept-license --answer-yes
+      - SPLUNK_STANDALONE_URL=splunk:9997
+      - SPLUNK_USER=root
+      - SPLUNK_ADD=monitor /opt/nifi/nifi-current/logs
+      - SPLUNK_PASSWORD=password
+    restart: always
+    volumes:
+      - log_volume_splunk:/opt/nifi/nifi-current/logs

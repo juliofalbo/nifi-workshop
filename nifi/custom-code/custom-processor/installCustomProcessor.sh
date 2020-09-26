@@ -6,4 +6,4 @@ cd "$BASEDIR/CustomProcessor" || exit;
 
 mvn clean install
 
-cp "$BASEDIR/CustomProcessor/nifi-custom-nar/target/nifi-custom-nar-1.0.nar" "$BASEDIR/../libs"
+cp "$BASEDIR/CustomProcessor/nifi-custom-nar/target/nifi-custom-nar-1.0.nar" "$BASEDIR/../../libs"
