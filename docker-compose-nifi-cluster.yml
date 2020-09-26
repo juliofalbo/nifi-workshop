@@ -5,6 +5,10 @@ version: "3.6"
 networks:
   nifi-wkshop:
 
+# https://docs.docker.com/compose/compose-file/#volumes
+volumes:
+  log_volume_splunk:
+
 services:
   nifi:
     # https://hub.docker.com/r/apache/nifi
@@ -17,8 +21,19 @@ services:
     environment:
       - NIFI_WEB_HTTP_PORT=8080
       - NIFI_CLUSTER_IS_NODE=true
+      - NIFI_REMOTE_INPUT_HOST=nifi
+      - NIFI_REMOTE_INPUT_SOCKET_PORT=8000
       - NIFI_CLUSTER_NODE_PROTOCOL_PORT=8082
       - NIFI_ZK_CONNECT_STRING=zookeeper:2181 #This env var by default already change the state-management.xml and the nifi.zookeeper.connect.string prop
       - NIFI_ELECTION_MAX_WAIT=1 min
       - NIFI_ELECTION_MAX_CANDIDATES=2
       - NIFI_VARIABLE_REGISTRY_PROPERTIES=./conf/db.properties
+    volumes:
+      - log_volume_splunk:/opt/nifi/nifi-current/logs
+      - ./postgres/postgresql-42.2.14.jar:/opt/nifi/nifi-current/lib/postgresql-42.2.14.jar
+      - ./postgres/db.properties:/opt/nifi/nifi-current/conf/db.properties
+      - ./nifi/libs/nifi-metrics-1.11.4.jar:/opt/nifi/nifi-current/lib/nifi-metrics-1.11.4.jar
+      - ./nifi/libs/metrics-jvm-4.1.0.jar:/opt/nifi/nifi-current/lib/metrics-jvm-4.1.0.jar
+      - ./nifi/libs/metrics-core-4.1.0.jar:/opt/nifi/nifi-current/lib/metrics-core-4.1.0.jar
+      - ./nifi/libs/http-builder-0.7.1.jar:/opt/nifi/nifi-current/lib/http-builder-0.7.1.jar
+      - ./nifi/libs/nifi-custom-nar-1.0.nar:/opt/nifi/nifi-current/lib/nifi-custom-nar-1.0.nar

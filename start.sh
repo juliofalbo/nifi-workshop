@@ -83,7 +83,7 @@ function getScaleArgumentValue {
   if [[ ${SCALE_VALUE[0]} ]] ; then
     echo "${SCALE_VALUE[0]}";
   else
-    echo 2;
+    echo 3;
   fi
 
 }
