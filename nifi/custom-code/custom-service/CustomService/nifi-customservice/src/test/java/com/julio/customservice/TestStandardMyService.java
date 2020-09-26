@@ -17,17 +17,13 @@
 package com.julio.customservice;
 
 import org.apache.nifi.reporting.InitializationException;
-import org.apache.nifi.util.MockFlowFile;
 import org.apache.nifi.util.TestRunner;
 import org.apache.nifi.util.TestRunners;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.HashMap;
-import java.util.Map;
+import org.junit.rules.ExpectedException;
 
 public class TestStandardMyService {
 
@@ -39,7 +35,6 @@ public class TestStandardMyService {
     @Test
     public void testService() throws InitializationException {
         final TestRunner runner = TestRunners.newTestRunner(TestProcessor.class);
-        runner.enqueue("test");
 
         final StandardMyService service = new StandardMyService();
         runner.addControllerService("test-good", service);
@@ -49,10 +44,71 @@ public class TestStandardMyService {
         runner.enableControllerService(service);
 
         runner.assertValid(service);
+    }
+
+    @Test
+    public void testServiceErrorEmptyToken() {
+        Assert.assertThrows("TOKEN cannot be empty", IllegalStateException.class, () -> {
+            final TestRunner runner = TestRunners.newTestRunner(TestProcessor.class);
+
+            final StandardMyService service = new StandardMyService();
+            runner.addControllerService("test-good", service);
+
+            String token = "";
+            runner.setProperty(service, StandardMyService.TOKEN, token);
+            runner.enableControllerService(service);
+        });
+    }
+
+    @Test
+    public void testServiceErrorNullToken() {
+        Assert.assertThrows("TOKEN cannot be empty", IllegalStateException.class, () -> {
+            final TestRunner runner = TestRunners.newTestRunner(TestProcessor.class);
+
+            final StandardMyService service = new StandardMyService();
+            runner.addControllerService("test-good", service);
+
+            String token = null;
+            runner.setProperty(service, StandardMyService.TOKEN, token);
+            runner.enableControllerService(service);
+        });
+    }
+
+    @Test
+    public void testServiceErrorTokenTooLarge() {
+        String token = "31231234124124124124515431";
+        Assert.assertThrows("Token '" + token + "' cannot have more than 10 chars", IllegalStateException.class, () -> {
+
+            final TestRunner runner = TestRunners.newTestRunner(TestProcessor.class);
+
+            final StandardMyService service = new StandardMyService();
+            runner.addControllerService("test-good", service);
+
+            runner.setProperty(service, StandardMyService.TOKEN, token);
+            runner.enableControllerService(service);
+        });
+    }
+
+    @Test
+    public void testServiceRunningProcessor() throws InitializationException {
+        final TestRunner runner = TestRunners.newTestRunner(TestProcessor.class);
+        runner.enqueue("test");
+
+        final StandardMyService service = new StandardMyService();
+        String token = "test-value";
+        runner.addControllerService("SECRET_TOKEN_SERVICE", service);
+        runner.setProperty(service, StandardMyService.TOKEN, token);
+        runner.enableControllerService(service);
+        runner.setProperty(TestProcessor.SECRET_TOKEN_SERVICE, "SECRET_TOKEN_SERVICE");
+
+        runner.assertValid(service);
+        runner.run();
+
         runner.assertTransferCount(TestProcessor.REL_FAILURE, 0);
+        runner.assertTransferCount(TestProcessor.REL_SUCCESS, 1);
         runner.assertAllFlowFiles(TestProcessor.REL_SUCCESS, f -> {
             Assert.assertNotNull(f.getAttribute("token"));
-            Assert.assertEquals(token, f.getAttribute("treated"));
+            Assert.assertEquals(token, f.getAttribute("token"));
         });
     }
 

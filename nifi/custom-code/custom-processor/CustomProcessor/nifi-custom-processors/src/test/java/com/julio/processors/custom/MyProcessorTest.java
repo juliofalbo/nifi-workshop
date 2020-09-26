@@ -43,7 +43,7 @@ public class MyProcessorTest {
     }
 
     @Test
-    public void processor_should_work_fine() throws FileNotFoundException {
+    public void processorShouldWorkFine() throws FileNotFoundException {
 
         final String filename = "firstTest.json";
         MockFlowFile flowFile = testRunner.enqueue(new FileInputStream(new File("src/test/resources/" + filename)));
@@ -72,7 +72,7 @@ public class MyProcessorTest {
     }
 
     @Test
-    public void flowfile_should_go_to_failed_rel_due_no_tags() throws FileNotFoundException {
+    public void flowfileShouldGoToFailedRelDueNoTags() throws FileNotFoundException {
 
         final String filename = "noTags.json";
         MockFlowFile flowFile = testRunner.enqueue(new FileInputStream(new File("src/test/resources/" + filename)));
@@ -98,7 +98,7 @@ public class MyProcessorTest {
     }
 
     @Test
-    public void flowfile_should_go_to_failed_rel_due_invalid_format() throws FileNotFoundException {
+    public void flowfileShouldGoToFailedRelDueInvalidFormat() throws FileNotFoundException {
 
         final String filename = "invalid.json";
         MockFlowFile flowFile = testRunner.enqueue(new FileInputStream(new File("src/test/resources/" + filename)));

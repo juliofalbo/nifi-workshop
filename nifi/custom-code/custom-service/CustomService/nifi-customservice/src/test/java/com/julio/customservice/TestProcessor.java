@@ -44,9 +44,14 @@ public class TestProcessor extends AbstractProcessor {
         .build();
 
     private Set<Relationship> relationships;
+    private List<PropertyDescriptor> descriptors;
 
     @Override
     protected void init(final ProcessorInitializationContext context) {
+        final List<PropertyDescriptor> descriptors = new ArrayList<PropertyDescriptor>();
+        descriptors.add(SECRET_TOKEN_SERVICE);
+        this.descriptors = Collections.unmodifiableList(descriptors);
+
         final Set<Relationship> relationships = new HashSet<>();
         relationships.add(REL_SUCCESS);
         relationships.add(REL_FAILURE);
@@ -74,14 +79,7 @@ public class TestProcessor extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        List<PropertyDescriptor> propDescs = new ArrayList<>();
-        propDescs.add(new PropertyDescriptor.Builder()
-                .name("MyService test processor")
-                .description("MyService test processor")
-                .identifiesControllerService(MyService.class)
-                .required(true)
-                .build());
-        return propDescs;
+        return this.descriptors;
     }
 
 }
