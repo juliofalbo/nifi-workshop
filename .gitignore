@@ -29,4 +29,14 @@
 nifi-registry/providers.xml
 /nifi-registry-repo
 
+/nifi/custom-code/custom-processor/CustomProcessor/target
+/nifi/custom-code/custom-processor/CustomProcessor/nifi-custom-nar/target
+/nifi/custom-code/custom-processor/CustomProcessor/nifi-custom-processors/target
+
+/nifi/custom-code/custom-service/CustomService/target
+/nifi/custom-code/custom-service/CustomService/nifi-customservice/target
+/nifi/custom-code/custom-service/CustomService/nifi-customservice-api/target
+/nifi/custom-code/custom-service/CustomService/nifi-customservice-api-nar/target
+/nifi/custom-code/custom-service/CustomService/nifi-customservice-nar/target
+
 targets.json
