@@ -40,7 +40,7 @@ function usage
 "Usage: $SCRIPT [options] <command> [arguments]"
 ""
 "Commands:"
-"  nifi            ./cli.sh scale nifi <NUMBER_OF_INSTANCES> - It will scale NIFI's containers"
+"  nifi            ./nifi-env-cli scale nifi <NUMBER_OF_INSTANCES> - It will scale NIFI's containers"
 ""
 ""
 "Options:"

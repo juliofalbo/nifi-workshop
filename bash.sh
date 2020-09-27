@@ -38,9 +38,10 @@ function usage
 "Usage: $SCRIPT [options] <command> [arguments]"
 ""
 "Commands:"
-"  nifi            ./cli.sh bash nifi - It will enter in the bash of NIFI's container"
-"  nginx           ./cli.sh bash nginx - It will enter in the bash of Nginx's container"
-"  grafana         ./cli.sh bash grafana - It will enter in the bash of Grafana's container"
+"  nifi            ./nifi-env-cli bash nifi - It will enter in the bash of NIFI's container"
+"  nginx           ./nifi-env-cli bash nginx - It will enter in the bash of Nginx's container"
+"  kafka           ./nifi-env-cli bash kafka - It will enter in the bash of Kafka's container"
+"  grafana         ./nifi-env-cli bash grafana - It will enter in the bash of Grafana's container"
 ""
 ""
 "Options:"
@@ -76,6 +77,14 @@ function bash-nginx
 {
   print_cyan "Entering in the bash NGINX container"
   docker exec -it nginx bash
+}
+
+# Function responsible to enter in the Kafka's container bash
+#
+function bash-kafka
+{
+  print_cyan "Entering in the bash Kafka container"
+  docker exec -it kafka bash
 }
 
 # Function responsible to enter in the Grafana's container bash
@@ -135,6 +144,7 @@ do
 
         nifi         \
         | nginx      \
+        | kafka      \
         | grafana)
             shift
             "bash-$argument" "$@"

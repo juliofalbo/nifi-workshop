@@ -37,11 +37,18 @@ function usage() {
     "Usage: $SCRIPT [options] <command> [arguments]"
     ""
     "Commands:"
-    "  all             ./cli.sh stop all        - It will stop the whole env"
-    "  nifi            ./cli.sh stop nifi       - It will stop only NiFi"
-    "  services        ./cli.sh stop services   - It will stop all services around NiFi"
-    "  monitoring      ./cli.sh stop monitoring - It will stop only Grafana and Prometheus"
-    "- Note: You can combine commands like: ./cli.sh stop nifi monitoring"
+    "  all             ./nifi-env-cli stop all        - It will stop the whole env"
+    "  nifi            ./nifi-env-cli stop nifi       - It will stop only NiFi"
+    "  allservices     ./nifi-env-cli stop allservices    - It will stop services for the Apache NiFi environment"
+    "  mongo           ./nifi-env-cli stop mongo    - It will stop MongoDB Environment"
+    "  kafka           ./nifi-env-cli stop kafka    - It will stop Apache Kafka environment"
+    "  solr            ./nifi-env-cli stop solr    - It will stop Apache Solr"
+    "  splunk          ./nifi-env-cli stop splunk    - It will stop Splunk"
+    "  rabbitmq        ./nifi-env-cli stop rabbitmq    - It will stop RabbitMQ"
+    "  registry        ./nifi-env-cli stop registry    - It will stop NiFi Registry"
+    "  postgres        ./nifi-env-cli stop postgres    - It will stop Postgres"
+    "  monitoring      ./nifi-env-cli stop monitoring - It will stop only Grafana and Prometheus"
+    "- Note: You can combine commands like: ./nifi-env-cli stop nifi kafka monitoring"
     ""
     ""
     "Options:"
@@ -66,10 +73,10 @@ function version() {
 # Function responsible to stop ALL apps
 #
 function stop-all() {
-  stop-services "$@"
+  stop-allservices "$@"
   stop-monitoring "$@"
   stop-nifi "$@"
-  stop-services "$@"
+  stop-allservices "$@"
   echo
 }
 
@@ -95,7 +102,7 @@ function stop-nifi() {
     fi
 
     #https://github.com/juliofalbo/docker-compose-prometheus-service-discovery
-  "$HOME/workspace/docker-compose-prometheus-service-discovery/docker-prmt-serv-disc.sh" stop
+    "$HOME/workspace/docker-compose-prometheus-service-discovery/docker-prmt-serv-disc.sh" stop
 
     print_green "NiFi stopped"
     echo
@@ -106,21 +113,157 @@ function stop-nifi() {
 #
 # Function responsible to stop all Services
 #
-function stop-services() {
+function stop-allservices() {
+  stop-kafka "$@"
+  stop-mongo "$@"
+  stop-registry "$@"
+  stop-splunk "$@"
+  stop-solr "$@"
+  stop-rabbitmq "$@"
+  stop-postgres "$@"
+  echo
+}
+
+#
+# Function responsible to stop Kafka Environment
+#
+function stop-kafka() {
   REMOVE_VOLUME=$(getRemoveVolumeArgumentValue "$@")
   if [ "$REMOVE_VOLUME" == 0 ]; then
-    print_red "Stopping all Services removing volumes"
-    docker-compose -f "$BASEDIR/docker-compose-services.yml" down -v
-    docker-compose -f "$BASEDIR/docker-compose-services.yml" down -v
-    docker-compose -f "$BASEDIR/docker-compose-nifi-cluster-env.yml" down -v
-    docker-compose -f "$BASEDIR/docker-compose-nifi-cluster-env.yml" down -v
+    print_red "Stopping Kafka Environment removing volumes"
+    docker-compose -f "$BASEDIR/docker-compose-kafka.yml" down -v --remove-orphans
   else
-    print_red "Stopping all Services keeping volumes"
-    docker-compose -f "$BASEDIR/docker-compose-services.yml" down
-    docker-compose -f "$BASEDIR/docker-compose-nifi-cluster-env.yml" down
+    print_red "Stopping Kafka Environment keeping volumes"
+    docker-compose -f "$BASEDIR/docker-compose-kafka.yml" down --remove-orphans
   fi
 
-  print_green "All services stopped"
+  print_green "Kafka Environment stopped"
+  echo
+}
+
+#
+# Function responsible to stop MongoDB Environment
+#
+function stop-mongo() {
+  REMOVE_VOLUME=$(getRemoveVolumeArgumentValue "$@")
+  if [ "$REMOVE_VOLUME" == 0 ]; then
+    print_red "Stopping MongoDB Environment removing volumes"
+    docker-compose -f "$BASEDIR/docker-compose-mongo.yml" down -v --remove-orphans
+  else
+    print_red "Stopping MongoDB Environment keeping volumes"
+    docker-compose -f "$BASEDIR/docker-compose-mongo.yml" down --remove-orphans
+  fi
+
+  print_green "MongoDB Environment stopped"
+  echo
+
+}
+
+
+#
+# Function responsible to stop NiFi Registry
+#
+function stop-registry() {
+  REMOVE_VOLUME=$(getRemoveVolumeArgumentValue "$@")
+  if [ "$REMOVE_VOLUME" == 0 ]; then
+    print_red "Stopping NiFi Registry removing volumes"
+    docker-compose -f "$BASEDIR/docker-compose-nifi-registry.yml" down -v --remove-orphans
+  else
+    print_red "Stopping NiFi Registry keeping volumes"
+    docker-compose -f "$BASEDIR/docker-compose-nifi-registry.yml" down --remove-orphans
+  fi
+
+  print_green "NiFi Registry stopped"
+  echo
+
+}
+
+#
+# Function responsible to stop Postgres
+#
+function stop-postgres() {
+  REMOVE_VOLUME=$(getRemoveVolumeArgumentValue "$@")
+  if [ "$REMOVE_VOLUME" == 0 ]; then
+    print_red "Stopping Postgres removing volumes"
+    docker-compose -f "$BASEDIR/docker-compose-postgres.yml" down -v --remove-orphans
+  else
+    print_red "Stopping Postgres keeping volumes"
+    docker-compose -f "$BASEDIR/docker-compose-postgres.yml" down --remove-orphans
+  fi
+
+  print_green "Postgres stopped"
+  echo
+
+}
+
+#
+# Function responsible to stop RabbitMQ
+#
+function stop-rabbitmq() {
+  REMOVE_VOLUME=$(getRemoveVolumeArgumentValue "$@")
+  if [ "$REMOVE_VOLUME" == 0 ]; then
+    print_red "Stopping RabbitMQ removing volumes"
+    docker-compose -f "$BASEDIR/docker-compose-rabbitmq.yml" down -v --remove-orphans
+  else
+    print_red "Stopping RabbitMQ keeping volumes"
+    docker-compose -f "$BASEDIR/docker-compose-rabbitmq.yml" down --remove-orphans
+  fi
+
+  print_green "RabbitMQ stopped"
+  echo
+
+}
+
+#
+# Function responsible to stop Apache Solr
+#
+function stop-solr() {
+  REMOVE_VOLUME=$(getRemoveVolumeArgumentValue "$@")
+  if [ "$REMOVE_VOLUME" == 0 ]; then
+    print_red "Stopping Apache Solr removing volumes"
+    docker-compose -f "$BASEDIR/docker-compose-solr.yml" down -v --remove-orphans
+  else
+    print_red "Stopping Apache Solr keeping volumes"
+    docker-compose -f "$BASEDIR/docker-compose-solr.yml" down --remove-orphans
+  fi
+
+  print_green "Apache Solr stopped"
+  echo
+
+}
+
+#
+# Function responsible to stop Splunk
+#
+function stop-splunk() {
+  REMOVE_VOLUME=$(getRemoveVolumeArgumentValue "$@")
+  if [ "$REMOVE_VOLUME" == 0 ]; then
+    print_red "Stopping Splunk removing volumes"
+    docker-compose -f "$BASEDIR/docker-compose-splunk.yml" down -v --remove-orphans
+  else
+    print_red "Stopping Splunk keeping volumes"
+    docker-compose -f "$BASEDIR/docker-compose-splunk.yml" down --remove-orphans
+  fi
+
+  print_green "Splunk stopped"
+  echo
+
+}
+
+#
+# Function responsible to stop NiFi Zookeeper and Nginx
+#
+function stop-clusterenv() {
+  REMOVE_VOLUME=$(getRemoveVolumeArgumentValue "$@")
+  if [ "$REMOVE_VOLUME" == 0 ]; then
+    print_red "Stopping NiFi Zookeeper and Nginx removing volumes"
+    docker-compose -f "$BASEDIR/docker-compose-nifi-cluster-env.yml" down -v --remove-orphans
+  else
+    print_red "Stopping NiFi Zookeeper and Nginx keeping volumes"
+    docker-compose -f "$BASEDIR/docker-compose-nifi-cluster-env.yml" down --remove-orphans
+  fi
+
+  print_green "NiFi Zookeeper and Nginx stopped"
   echo
 
 }
@@ -143,7 +286,7 @@ function stop-monitoring() {
 }
 
 #
-# Method responsible to check if the database should start with reset argument
+# Method responsible to check if the volumes should be removed
 #
 function getRemoveVolumeArgumentValue() {
   REMOVE_VOLUMES_RETURN_VALUE=1
@@ -202,7 +345,14 @@ for argument in "$@"; do
   ;;
 
   nifi \
-  | services \
+  | allservices \
+  | splunk \
+  | solr \
+  | kafka \
+  | rabbitmq \
+  | postgres \
+  | registry \
+  | mongo \
   | monitoring)
     shift
     "stop-$argument" "$@"

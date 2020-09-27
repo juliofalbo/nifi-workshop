@@ -17,7 +17,6 @@ services:
       - "nifi-wkshop"
     ports:
       - "8080"
-      - "9092"
     environment:
       - NIFI_WEB_HTTP_PORT=8080
       - NIFI_CLUSTER_IS_NODE=true

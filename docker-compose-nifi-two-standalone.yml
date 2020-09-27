@@ -35,7 +35,6 @@ services:
       - "nifi-wkshop"
     ports:
       - "8080:8080"
-      - "9092:9092"
     environment:
       - NIFI_VARIABLE_REGISTRY_PROPERTIES=./conf/db.properties
       - NIFI_REMOTE_INPUT_HOST=nifi
@@ -68,7 +67,6 @@ services:
       - "nifi-wkshop"
     ports:
       - "8089:8080"
-      - "9099:9092"
     environment:
       - NIFI_VARIABLE_REGISTRY_PROPERTIES=./conf/db.properties
       - NIFI_REMOTE_INPUT_HOST=nifitwo
@@ -103,6 +101,8 @@ services:
     restart: always
     volumes:
       - nifi_workshop_nifi_logs:/opt/nifi/nifi-current/logs
+    networks:
+      - "nifi-wkshop"
   splunkforwarder-nifi2:
     image: splunk/universalforwarder:8.0
     hostname: splunkforwarder-nifi2
@@ -115,3 +115,5 @@ services:
     restart: always
     volumes:
       - nifi_workshop_nifi_logs_2:/opt/nifi/nifi-current/logs
+    networks:
+      - "nifi-wkshop"

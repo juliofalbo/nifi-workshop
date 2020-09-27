@@ -1,0 +1,25 @@
+# https://docs.docker.com/compose/compose-file/
+version: "3.6"
+
+# https://docs.docker.com/compose/compose-file/#networks
+networks:
+  nifi-wkshop:
+
+# https://docs.docker.com/compose/compose-file/#volumes
+volumes:
+  log_volume_splunk:
+
+services:
+  splunk:
+    image: splunk/splunk:8.0
+    hostname: splunk
+    container_name: splunk
+    environment:
+      - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_USER=root
+      - SPLUNK_ENABLE_LISTEN=9997
+      - SPLUNK_PASSWORD=password
+    ports:
+      - "8000:8000"
+    networks:
+      - "nifi-wkshop"

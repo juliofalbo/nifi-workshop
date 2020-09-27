@@ -29,7 +29,6 @@ services:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
       - "8080:8080"
-      - "9092:9092"
     networks:
       - "nifi-wkshop"
   splunkforwarder:
@@ -44,3 +43,5 @@ services:
     restart: always
     volumes:
       - log_volume_splunk:/opt/nifi/nifi-current/logs
+    networks:
+      - "nifi-wkshop"

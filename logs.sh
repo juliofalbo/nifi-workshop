@@ -38,10 +38,10 @@ function usage
 "Usage: $SCRIPT [options] <command> [arguments]"
 ""
 "Commands:"
-"  nifi            ./cli.sh logs nifi - It will show the NIFI's container logs"
-"  nginx           ./cli.sh logs nginx - It will show the Nginx's container logs"
-"  grafana         ./cli.sh logs grafana - It will show the Grafana's container logs"
-"  prometheus      ./cli.sh logs prometheus - It will show the Prometheus's container logs"
+"  nifi            ./nifi-env-cli logs nifi - It will show the NIFI's container logs"
+"  nginx           ./nifi-env-cli logs nginx - It will show the Nginx's container logs"
+"  grafana         ./nifi-env-cli logs grafana - It will show the Grafana's container logs"
+"  prometheus      ./nifi-env-cli logs prometheus - It will show the Prometheus's container logs"
 ""
 ""
 "Options:"
@@ -118,6 +118,19 @@ function log-prometheus
   fi
 }
 
+# Function responsible to show the Kafka's container logs
+#
+function log-kafka
+{
+  LOG_FOLLOW_VALUE=$(getFollowArgumentValue "$@");
+   if [ "$LOG_FOLLOW_VALUE" == 0 ]
+  then
+    docker logs kafka -f
+  else
+    docker logs kafka
+  fi
+}
+
 #
 # Method responsible to return the specific APP scale value.
 # Default is 1
@@ -178,6 +191,7 @@ do
 
         nifi         \
         | nginx      \
+        | kafka      \
         | grafana    \
         | prometheus)
             shift

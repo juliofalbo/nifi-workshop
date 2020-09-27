@@ -1,0 +1,26 @@
+# https://docs.docker.com/compose/compose-file/
+version: "3.6"
+
+# https://docs.docker.com/compose/compose-file/#networks
+networks:
+  nifi-wkshop:
+
+services:
+  rabbitmq:
+    # https://hub.docker.com/r/pivotalrabbitmq/rabbitmq-prometheus/tags
+    image: pivotalrabbitmq/rabbitmq-prometheus:3.9.0-alpha.76-2019.10.30
+    container_name: 'rabbitmq'
+    networks:
+      - "nifi-wkshop"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+      - "15692:15692"
+    cap_add:
+      - ALL
+    hostname: rabbitmq
+    environment:
+      RABBITMQ_ERLANG_COOKIE: rabbitmq
+    volumes:
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./rabbitmq-definitions.json:/etc/rabbitmq/rabbitmq-definitions.json:ro

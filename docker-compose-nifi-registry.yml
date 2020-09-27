@@ -1,0 +1,44 @@
+# https://docs.docker.com/compose/compose-file/
+version: "3.6"
+
+# https://docs.docker.com/compose/compose-file/#networks
+networks:
+  nifi-wkshop:
+
+# https://docs.docker.com/compose/compose-file/#volumes
+volumes:
+  nifi_workshop_nifi_registry_conf:
+  nifi_workshop_nifi_registry_db:
+  nifi_workshop_nifi_registry_docs:
+  nifi_workshop_nifi_registry_ext:
+  nifi_workshop_nifi_registry_extension_bundles:
+  nifi_workshop_nifi_registry_flow_storage:
+  nifi_workshop_nifi_registry_lib:
+  nifi_workshop_nifi_registry_logs:
+  nifi_workshop_nifi_registry_run:
+  nifi_workshop_nifi_registry_work:
+
+services:
+  nifi-registry:
+    build:
+      context: ./nifi-registry
+      dockerfile: Dockerfile
+    container_name: 'nifi-registry'
+    networks:
+      - "nifi-wkshop"
+    ports:
+      - "18080:18080"
+    volumes:
+      - nifi_workshop_nifi_registry_db:/opt/nifi-registry/nifi-registry-current/database
+      - nifi_workshop_nifi_registry_docs:/opt/nifi-registry/nifi-registry-current/docs
+      - nifi_workshop_nifi_registry_ext:/opt/nifi-registry/nifi-registry-current/ext
+      - nifi_workshop_nifi_registry_extension_bundles:/opt/nifi-registry/nifi-registry-current/extension_bundles
+      - nifi_workshop_nifi_registry_lib:/opt/nifi-registry/nifi-registry-current/lib
+      - nifi_workshop_nifi_registry_logs:/opt/nifi-registry/nifi-registry-current/logs
+      - nifi_workshop_nifi_registry_run:/opt/nifi-registry/nifi-registry-current/run
+      - nifi_workshop_nifi_registry_work:/opt/nifi-registry/nifi-registry-current/work
+      #      Using the default Flow Storage
+      #      - nifi_workshop_nifi_registry_flow_storage:/opt/nifi-registry/nifi-registry-current/flow_storage
+      #      Using GIT Flow Storage
+      - ./nifi-registry-repo:/opt/nifi-registry/nifi-registry-current/flow_storage
+      - ./nifi-registry/providers.xml:/opt/nifi-registry/nifi-registry-current/conf/providers.xml

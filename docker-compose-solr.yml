@@ -1,0 +1,25 @@
+# https://docs.docker.com/compose/compose-file/
+version: "3.6"
+
+# https://docs.docker.com/compose/compose-file/#networks
+networks:
+  nifi-wkshop:
+
+# https://docs.docker.com/compose/compose-file/#volumes
+volumes:
+  solr_data:
+
+services:
+  solr:
+    image: solr:8.6
+    container_name: solr
+    ports:
+      - "8983:8983"
+    volumes:
+      - solr_data:/var/slr
+    entrypoint:
+      - bash
+      - "-c"
+      - "precreate-core nifi-core; exec solr -f"
+    networks:
+      - "nifi-wkshop"

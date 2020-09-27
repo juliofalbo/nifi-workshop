@@ -1,0 +1,35 @@
+# https://docs.docker.com/compose/compose-file/
+version: "3.6"
+
+# https://docs.docker.com/compose/compose-file/#networks
+networks:
+  nifi-wkshop:
+
+# https://docs.docker.com/compose/compose-file/#volumes
+volumes:
+  kafka:
+
+services:
+  zookeeper-kafka:
+    container_name: zookeeper-kafka
+    image: wurstmeister/zookeeper
+    ports:
+      - "2185:2181"
+    networks:
+      - "nifi-wkshop"
+  kafka:
+    build:
+      context: ./kafka
+      dockerfile: Dockerfile
+    ports:
+      - "9092:9092"
+    container_name: kafka
+    hostname: kafka
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: host.docker.internal
+      KAFKA_CREATE_TOPICS: "nifi:1:1"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-kafka:2181
+    volumes:
+      - kafka:/var/run/docker.sock
+    networks:
+      - "nifi-wkshop"

@@ -2,4 +2,4 @@ target_json_path: "/Users/jfa/workspace/nifi-workshop"
 services:
   - name: nifi
     container_prefix: "nifi-workshop_nifi_"
-    internal_port: 9092
+    internal_port: 8080
