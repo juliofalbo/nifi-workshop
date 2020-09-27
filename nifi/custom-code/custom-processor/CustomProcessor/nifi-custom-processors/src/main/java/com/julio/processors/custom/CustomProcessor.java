@@ -16,7 +16,7 @@
  */
 package com.julio.processors.custom;
 
-import com.julio.customservice.StandardMyService;
+import com.julio.customservice.MyService;
 import org.apache.nifi.annotation.behavior.ReadsAttribute;
 import org.apache.nifi.annotation.behavior.ReadsAttributes;
 import org.apache.nifi.annotation.behavior.WritesAttribute;
@@ -40,7 +40,6 @@ import org.json.simple.parser.ParseException;
 
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidParameterException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -65,7 +64,7 @@ public class MyProcessor extends AbstractProcessor {
         .Builder().name("SECRET_TOKEN_SERVICE")
                   .displayName("Tags Starting With")
                   .description("Only get tags which starts with")
-                  .identifiesControllerService(StandardMyService.class)
+                  .identifiesControllerService(MyService.class)
                   .required(true)
                   .build();
 
@@ -120,8 +119,8 @@ public class MyProcessor extends AbstractProcessor {
 
     @Override
     protected Collection<ValidationResult> customValidate(ValidationContext validationContext) {
-        final StandardMyService secretTokenService = validationContext.getProperty(SECRET_TOKEN_SERVICE)
-                                                                      .asControllerService(StandardMyService.class);
+        final MyService secretTokenService = validationContext.getProperty(SECRET_TOKEN_SERVICE)
+                                                                      .asControllerService(MyService.class);
 
 
         List<ValidationResult> results = new ArrayList<>(super.customValidate(validationContext));
@@ -195,7 +194,7 @@ public class MyProcessor extends AbstractProcessor {
         }
     }
 
-    private boolean isValidToken(StandardMyService secretTokenService) {
+    private boolean isValidToken(MyService secretTokenService) {
         if (secretTokenService.getToken() == null
             || secretTokenService.getToken()
                                  .isEmpty()

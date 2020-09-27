@@ -17,7 +17,12 @@
 package com.julio.processors.custom;
 
 import com.julio.customservice.MyService;
-import com.julio.customservice.StandardMyService;
+import org.apache.nifi.annotation.lifecycle.OnEnabled;
+import org.apache.nifi.components.PropertyDescriptor;
+import org.apache.nifi.controller.AbstractControllerService;
+import org.apache.nifi.controller.ConfigurationContext;
+import org.apache.nifi.processor.exception.ProcessException;
+import org.apache.nifi.processor.util.StandardValidators;
 import org.apache.nifi.reporting.InitializationException;
 import org.apache.nifi.util.MockFlowFile;
 import org.apache.nifi.util.TestRunner;
@@ -29,9 +34,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public class MyProcessorTest {
@@ -40,7 +43,7 @@ public class MyProcessorTest {
 
     @Before
     public void init() {
-        testRunner = TestRunners.newTestRunner(MyProcessor.class);
+        testRunner = TestRunners.newTestRunner(CustomProcessor.class);
     }
 
     @Test
@@ -56,19 +59,19 @@ public class MyProcessorTest {
         flowFile.putAttributes(attrs);
 
         testRunner.setValidateExpressionUsage(false);
-        testRunner.setProperty(MyProcessor.TAGS_STARTING_WITH, "l");
+        testRunner.setProperty(CustomProcessor.TAGS_STARTING_WITH, "l");
 
         configureCustomControllerService();
 
         testRunner.assertValid();
         testRunner.run();
-        testRunner.assertTransferCount(MyProcessor.REL_FAILURE, 0);
-        testRunner.assertAllFlowFiles(MyProcessor.REL_SUCCESS, f -> {
+        testRunner.assertTransferCount(CustomProcessor.REL_FAILURE, 0);
+        testRunner.assertAllFlowFiles(CustomProcessor.REL_SUCCESS, f -> {
             Assert.assertNotNull(f.getAttribute("treated"));
             Assert.assertEquals("true", f.getAttribute("treated"));
         });
 
-        List<MockFlowFile> flowFilesForRelationship = testRunner.getFlowFilesForRelationship(MyProcessor.REL_SUCCESS);
+        List<MockFlowFile> flowFilesForRelationship = testRunner.getFlowFilesForRelationship(CustomProcessor.REL_SUCCESS);
         Assert.assertEquals(1, flowFilesForRelationship.size());
         Assert.assertEquals("laborum,labore,labore", flowFilesForRelationship.get(0).getContent());
     }
@@ -86,15 +89,15 @@ public class MyProcessorTest {
         flowFile.putAttributes(attrs);
 
         testRunner.setValidateExpressionUsage(false);
-        testRunner.setProperty(MyProcessor.TAGS_STARTING_WITH, "l");
+        testRunner.setProperty(CustomProcessor.TAGS_STARTING_WITH, "l");
 
         configureCustomControllerService();
 
         testRunner.assertValid();
         testRunner.run();
-        testRunner.assertTransferCount(MyProcessor.REL_SUCCESS, 0);
-        testRunner.assertTransferCount(MyProcessor.REL_FAILURE, 1);
-        testRunner.assertAllFlowFiles(MyProcessor.REL_FAILURE, f -> {
+        testRunner.assertTransferCount(CustomProcessor.REL_SUCCESS, 0);
+        testRunner.assertTransferCount(CustomProcessor.REL_FAILURE, 1);
+        testRunner.assertAllFlowFiles(CustomProcessor.REL_FAILURE, f -> {
             Assert.assertNotNull(f.getAttribute("treated"));
             Assert.assertEquals("false", f.getAttribute("treated"));
         });
@@ -113,26 +116,62 @@ public class MyProcessorTest {
         flowFile.putAttributes(attrs);
 
         testRunner.setValidateExpressionUsage(false);
-        testRunner.setProperty(MyProcessor.TAGS_STARTING_WITH, "l");
+        testRunner.setProperty(CustomProcessor.TAGS_STARTING_WITH, "l");
 
         configureCustomControllerService();
 
         testRunner.assertValid();
         testRunner.run();
-        testRunner.assertTransferCount(MyProcessor.REL_SUCCESS, 0);
-        testRunner.assertTransferCount(MyProcessor.REL_FAILURE, 1);
-        testRunner.assertAllFlowFiles(MyProcessor.REL_FAILURE, f -> {
+        testRunner.assertTransferCount(CustomProcessor.REL_SUCCESS, 0);
+        testRunner.assertTransferCount(CustomProcessor.REL_FAILURE, 1);
+        testRunner.assertAllFlowFiles(CustomProcessor.REL_FAILURE, f -> {
             Assert.assertNotNull(f.getAttribute("treated"));
             Assert.assertEquals("false", f.getAttribute("treated"));
         });
     }
 
     private void configureCustomControllerService() throws InitializationException {
-        final StandardMyService service = new StandardMyService();
+        final MockMyService service = new MockMyService();
         testRunner.addControllerService("SECRET_TOKEN_SERVICE", service);
-        testRunner.setProperty(service, StandardMyService.TOKEN, MyProcessor.TOKEN);
+        testRunner.setProperty(service, MockMyService.TOKEN, CustomProcessor.TOKEN);
         testRunner.enableControllerService(service);
-        testRunner.setProperty(MyProcessor.SECRET_TOKEN_SERVICE, "SECRET_TOKEN_SERVICE");
+        testRunner.setProperty(CustomProcessor.SECRET_TOKEN_SERVICE, "SECRET_TOKEN_SERVICE");
     }
 
+}
+
+class MockMyService extends AbstractControllerService implements MyService {
+
+    public static final PropertyDescriptor TOKEN = new PropertyDescriptor
+        .Builder().name("TOKEN")
+                  .displayName("Token")
+                  .description("Secret Token")
+                  .required(true)
+                  .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
+                  .build();
+
+    private static final List<PropertyDescriptor> properties;
+
+    static {
+        final List<PropertyDescriptor> props = new ArrayList<>();
+        props.add(TOKEN);
+        properties = Collections.unmodifiableList(props);
+    }
+
+    private ConfigurationContext context;
+
+    @Override
+    public String getToken() throws ProcessException {
+        return context.getProperty(TOKEN).getValue();
+    }
+
+    @OnEnabled
+    public void onEnabled(final ConfigurationContext context) {
+        this.context = context;
+    }
+
+    @Override
+    protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
+        return properties;
+    }
 }
