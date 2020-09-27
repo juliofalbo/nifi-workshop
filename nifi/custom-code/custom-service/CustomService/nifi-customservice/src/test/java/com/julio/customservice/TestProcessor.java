@@ -29,7 +29,7 @@ public class TestProcessor extends AbstractProcessor {
         .Builder().name("SECRET_TOKEN_SERVICE")
                   .displayName("Tags Starting With")
                   .description("Only get tags which starts with")
-                  .identifiesControllerService(StandardMyService.class)
+                  .identifiesControllerService(CustomControllerService.class)
                   .required(true)
                   .build();
 
@@ -61,7 +61,7 @@ public class TestProcessor extends AbstractProcessor {
     @Override
     public void onTrigger(ProcessContext context, ProcessSession session) throws ProcessException {
         FlowFile flowFile = session.get();
-        final StandardMyService secretTokenService = context.getProperty(SECRET_TOKEN_SERVICE).asControllerService(StandardMyService.class);
+        final CustomControllerService secretTokenService = context.getProperty(SECRET_TOKEN_SERVICE).asControllerService(CustomControllerService.class);
         String token = secretTokenService.getToken();
         if(token == null || token
                                                                       .isEmpty()){

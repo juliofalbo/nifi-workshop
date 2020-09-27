@@ -21,11 +21,9 @@ import org.apache.nifi.util.TestRunner;
 import org.apache.nifi.util.TestRunners;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
-public class TestStandardMyService {
+public class TestCustomControllerService {
 
     @Before
     public void init() {
@@ -36,11 +34,11 @@ public class TestStandardMyService {
     public void testService() throws InitializationException {
         final TestRunner runner = TestRunners.newTestRunner(TestProcessor.class);
 
-        final StandardMyService service = new StandardMyService();
+        final CustomControllerService service = new CustomControllerService();
         runner.addControllerService("test-good", service);
 
         String token = "test-value";
-        runner.setProperty(service, StandardMyService.TOKEN, token);
+        runner.setProperty(service, CustomControllerService.TOKEN, token);
         runner.enableControllerService(service);
 
         runner.assertValid(service);
@@ -51,11 +49,11 @@ public class TestStandardMyService {
         Assert.assertThrows("TOKEN cannot be empty", IllegalStateException.class, () -> {
             final TestRunner runner = TestRunners.newTestRunner(TestProcessor.class);
 
-            final StandardMyService service = new StandardMyService();
+            final CustomControllerService service = new CustomControllerService();
             runner.addControllerService("test-good", service);
 
             String token = "";
-            runner.setProperty(service, StandardMyService.TOKEN, token);
+            runner.setProperty(service, CustomControllerService.TOKEN, token);
             runner.enableControllerService(service);
         });
     }
@@ -65,11 +63,11 @@ public class TestStandardMyService {
         Assert.assertThrows("TOKEN cannot be empty", IllegalStateException.class, () -> {
             final TestRunner runner = TestRunners.newTestRunner(TestProcessor.class);
 
-            final StandardMyService service = new StandardMyService();
+            final CustomControllerService service = new CustomControllerService();
             runner.addControllerService("test-good", service);
 
             String token = null;
-            runner.setProperty(service, StandardMyService.TOKEN, token);
+            runner.setProperty(service, CustomControllerService.TOKEN, token);
             runner.enableControllerService(service);
         });
     }
@@ -81,10 +79,10 @@ public class TestStandardMyService {
 
             final TestRunner runner = TestRunners.newTestRunner(TestProcessor.class);
 
-            final StandardMyService service = new StandardMyService();
+            final CustomControllerService service = new CustomControllerService();
             runner.addControllerService("test-good", service);
 
-            runner.setProperty(service, StandardMyService.TOKEN, token);
+            runner.setProperty(service, CustomControllerService.TOKEN, token);
             runner.enableControllerService(service);
         });
     }
@@ -94,10 +92,10 @@ public class TestStandardMyService {
         final TestRunner runner = TestRunners.newTestRunner(TestProcessor.class);
         runner.enqueue("test");
 
-        final StandardMyService service = new StandardMyService();
+        final CustomControllerService service = new CustomControllerService();
         String token = "test-value";
         runner.addControllerService("SECRET_TOKEN_SERVICE", service);
-        runner.setProperty(service, StandardMyService.TOKEN, token);
+        runner.setProperty(service, CustomControllerService.TOKEN, token);
         runner.enableControllerService(service);
         runner.setProperty(TestProcessor.SECRET_TOKEN_SERVICE, "SECRET_TOKEN_SERVICE");
 

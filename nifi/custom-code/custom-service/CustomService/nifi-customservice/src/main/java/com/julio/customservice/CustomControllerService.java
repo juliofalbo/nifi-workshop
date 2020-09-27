@@ -36,7 +36,7 @@ import org.apache.nifi.reporting.InitializationException;
 
 @Tags({ "example" })
 @CapabilityDescription("Example ControllerService implementation of MyService.")
-public class StandardMyService extends AbstractControllerService implements MyService {
+public class CustomControllerService extends AbstractControllerService implements ICustomControllerService {
 
     public static final PropertyDescriptor TOKEN = new PropertyDescriptor
         .Builder().name("TOKEN")

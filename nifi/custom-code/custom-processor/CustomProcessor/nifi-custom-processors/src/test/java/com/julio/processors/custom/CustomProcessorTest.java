@@ -16,7 +16,7 @@
  */
 package com.julio.processors.custom;
 
-import com.julio.customservice.MyService;
+import com.julio.customservice.ICustomControllerService;
 import org.apache.nifi.annotation.lifecycle.OnEnabled;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.controller.AbstractControllerService;
@@ -37,7 +37,7 @@ import java.io.FileNotFoundException;
 import java.util.*;
 
 
-public class MyProcessorTest {
+public class CustomProcessorTest {
 
     private TestRunner testRunner;
 
@@ -140,7 +140,7 @@ public class MyProcessorTest {
 
 }
 
-class MockMyService extends AbstractControllerService implements MyService {
+class MockMyService extends AbstractControllerService implements ICustomControllerService {
 
     public static final PropertyDescriptor TOKEN = new PropertyDescriptor
         .Builder().name("TOKEN")

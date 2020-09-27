@@ -64,7 +64,7 @@
         </dependency>
         <dependency>
             <groupId>com.julio</groupId>
-            <artifactId>nifi-customservice</artifactId>
+            <artifactId>nifi-customservice-api</artifactId>
             <version>1.0</version>
         </dependency>
         <dependency>

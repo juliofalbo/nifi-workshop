@@ -16,7 +16,7 @@
  */
 package com.julio.processors.custom;
 
-import com.julio.customservice.MyService;
+import com.julio.customservice.ICustomControllerService;
 import org.apache.nifi.annotation.behavior.ReadsAttribute;
 import org.apache.nifi.annotation.behavior.ReadsAttributes;
 import org.apache.nifi.annotation.behavior.WritesAttribute;
@@ -48,7 +48,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @SeeAlso({})
 @ReadsAttributes({ @ReadsAttribute(attribute = "", description = "") })
 @WritesAttributes({ @WritesAttribute(attribute = "", description = "") })
-public class MyProcessor extends AbstractProcessor {
+public class CustomProcessor extends AbstractProcessor {
 
     // This is the property that will be added by the User via UI
     public static final PropertyDescriptor TAGS_STARTING_WITH = new PropertyDescriptor
@@ -62,9 +62,9 @@ public class MyProcessor extends AbstractProcessor {
 
     public static final PropertyDescriptor SECRET_TOKEN_SERVICE = new PropertyDescriptor
         .Builder().name("SECRET_TOKEN_SERVICE")
-                  .displayName("Tags Starting With")
-                  .description("Only get tags which starts with")
-                  .identifiesControllerService(MyService.class)
+                  .displayName("Secret Token")
+                  .description("Token responsible to enable this Processor")
+                  .identifiesControllerService(ICustomControllerService.class)
                   .required(true)
                   .build();
 
@@ -119,8 +119,8 @@ public class MyProcessor extends AbstractProcessor {
 
     @Override
     protected Collection<ValidationResult> customValidate(ValidationContext validationContext) {
-        final MyService secretTokenService = validationContext.getProperty(SECRET_TOKEN_SERVICE)
-                                                                      .asControllerService(MyService.class);
+        final ICustomControllerService secretTokenService = validationContext.getProperty(SECRET_TOKEN_SERVICE)
+                                                                             .asControllerService(ICustomControllerService.class);
 
 
         List<ValidationResult> results = new ArrayList<>(super.customValidate(validationContext));
@@ -194,7 +194,7 @@ public class MyProcessor extends AbstractProcessor {
         }
     }
 
-    private boolean isValidToken(MyService secretTokenService) {
+    private boolean isValidToken(ICustomControllerService secretTokenService) {
         if (secretTokenService.getToken() == null
             || secretTokenService.getToken()
                                  .isEmpty()

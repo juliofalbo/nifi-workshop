@@ -26,7 +26,9 @@ volumes:
 
 services:
   nifi:
-    # https://hub.docker.com/r/apache/nifi/tags
+#    build:
+#      context: ./nifi
+#      dockerfile: Dockerfile
     image: apache/nifi:1.12.0
     container_name: "nifi"
     networks:
@@ -50,14 +52,16 @@ services:
       - ./postgres/postgresql-42.2.14.jar:/opt/nifi/nifi-current/lib/postgresql-42.2.14.jar
       - ./postgres/db.properties:/opt/nifi/nifi-current/conf/db.properties
       - ./nifi/libs/nifi-metrics-1.12.0.jar:/opt/nifi/nifi-current/lib/nifi-metrics-1.12.0.jar
-      - ./nifi/libs/metrics-jvm-4.1.0.jar:/opt/nifi/nifi-current/lib/metrics-jvm-4.1.0.jar
-      - ./nifi/libs/metrics-core-4.1.0.jar:/opt/nifi/nifi-current/lib/metrics-core-4.1.0.jar
+      - ./nifi/libs/metrics-jvm-4.1.2.jar:/opt/nifi/nifi-current/lib/metrics-jvm-4.1.2.jar
+      - ./nifi/libs/metrics-core-4.1.2.jar:/opt/nifi/nifi-current/lib/metrics-core-4.1.2.jar
       - ./nifi/libs/http-builder-0.7.1.jar:/opt/nifi/nifi-current/lib/http-builder-0.7.1.jar
       - ./nifi/libs/nifi-custom-nar-1.0.nar:/opt/nifi/nifi-current/lib/nifi-custom-nar-1.0.nar
       - ./nifi/libs/nifi-customservice-nar-1.0.nar:/opt/nifi/nifi-current/lib/nifi-customservice-nar-1.0.nar
       - ./nifi/libs/nifi-customservice-api-nar-1.0.nar:/opt/nifi/nifi-current/lib/nifi-customservice-api-nar-1.0.nar
   nifitwo:
-    # https://hub.docker.com/r/apache/nifi/tags
+#    build:
+#      context: ./nifi
+#      dockerfile: Dockerfile
     image: apache/nifi:1.12.0
     container_name: "nifitwo"
     networks:
@@ -81,8 +85,8 @@ services:
       - ./postgres/postgresql-42.2.14.jar:/opt/nifi/nifi-current/lib/postgresql-42.2.14.jar
       - ./postgres/db.properties:/opt/nifi/nifi-current/conf/db.properties
       - ./nifi/libs/nifi-metrics-1.12.0.jar:/opt/nifi/nifi-current/lib/nifi-metrics-1.12.0.jar
-      - ./nifi/libs/metrics-jvm-4.1.0.jar:/opt/nifi/nifi-current/lib/metrics-jvm-4.1.0.jar
-      - ./nifi/libs/metrics-core-4.1.0.jar:/opt/nifi/nifi-current/lib/metrics-core-4.1.0.jar
+      - ./nifi/libs/metrics-jvm-4.1.2.jar:/opt/nifi/nifi-current/lib/metrics-jvm-4.1.2.jar
+      - ./nifi/libs/metrics-core-4.1.2.jar:/opt/nifi/nifi-current/lib/metrics-core-4.1.2.jar
       - ./nifi/libs/http-builder-0.7.1.jar:/opt/nifi/nifi-current/lib/http-builder-0.7.1.jar
       - ./nifi/libs/nifi-custom-nar-1.0.nar:/opt/nifi/nifi-current/lib/nifi-custom-nar-1.0.nar
       - ./nifi/libs/nifi-customservice-nar-1.0.nar:/opt/nifi/nifi-current/lib/nifi-customservice-nar-1.0.nar
