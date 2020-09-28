@@ -131,10 +131,10 @@ function stop-kafka() {
   REMOVE_VOLUME=$(getRemoveVolumeArgumentValue "$@")
   if [ "$REMOVE_VOLUME" == 0 ]; then
     print_red "Stopping Kafka Environment removing volumes"
-    docker-compose -f "$BASEDIR/docker-compose-kafka.yml" down -v --remove-orphans
+    docker-compose -f "$BASEDIR/docker-compose-kafka.yml" down -v
   else
     print_red "Stopping Kafka Environment keeping volumes"
-    docker-compose -f "$BASEDIR/docker-compose-kafka.yml" down --remove-orphans
+    docker-compose -f "$BASEDIR/docker-compose-kafka.yml" down
   fi
 
   print_green "Kafka Environment stopped"
@@ -148,10 +148,10 @@ function stop-mongo() {
   REMOVE_VOLUME=$(getRemoveVolumeArgumentValue "$@")
   if [ "$REMOVE_VOLUME" == 0 ]; then
     print_red "Stopping MongoDB Environment removing volumes"
-    docker-compose -f "$BASEDIR/docker-compose-mongo.yml" down -v --remove-orphans
+    docker-compose -f "$BASEDIR/docker-compose-mongo.yml" down -v
   else
     print_red "Stopping MongoDB Environment keeping volumes"
-    docker-compose -f "$BASEDIR/docker-compose-mongo.yml" down --remove-orphans
+    docker-compose -f "$BASEDIR/docker-compose-mongo.yml" down
   fi
 
   print_green "MongoDB Environment stopped"
@@ -167,10 +167,10 @@ function stop-registry() {
   REMOVE_VOLUME=$(getRemoveVolumeArgumentValue "$@")
   if [ "$REMOVE_VOLUME" == 0 ]; then
     print_red "Stopping NiFi Registry removing volumes"
-    docker-compose -f "$BASEDIR/docker-compose-nifi-registry.yml" down -v --remove-orphans
+    docker-compose -f "$BASEDIR/docker-compose-nifi-registry.yml" down -v
   else
     print_red "Stopping NiFi Registry keeping volumes"
-    docker-compose -f "$BASEDIR/docker-compose-nifi-registry.yml" down --remove-orphans
+    docker-compose -f "$BASEDIR/docker-compose-nifi-registry.yml" down
   fi
 
   print_green "NiFi Registry stopped"
@@ -185,10 +185,10 @@ function stop-postgres() {
   REMOVE_VOLUME=$(getRemoveVolumeArgumentValue "$@")
   if [ "$REMOVE_VOLUME" == 0 ]; then
     print_red "Stopping Postgres removing volumes"
-    docker-compose -f "$BASEDIR/docker-compose-postgres.yml" down -v --remove-orphans
+    docker-compose -f "$BASEDIR/docker-compose-postgres.yml" down -v
   else
     print_red "Stopping Postgres keeping volumes"
-    docker-compose -f "$BASEDIR/docker-compose-postgres.yml" down --remove-orphans
+    docker-compose -f "$BASEDIR/docker-compose-postgres.yml" down
   fi
 
   print_green "Postgres stopped"
@@ -203,10 +203,10 @@ function stop-rabbitmq() {
   REMOVE_VOLUME=$(getRemoveVolumeArgumentValue "$@")
   if [ "$REMOVE_VOLUME" == 0 ]; then
     print_red "Stopping RabbitMQ removing volumes"
-    docker-compose -f "$BASEDIR/docker-compose-rabbitmq.yml" down -v --remove-orphans
+    docker-compose -f "$BASEDIR/docker-compose-rabbitmq.yml" down -v
   else
     print_red "Stopping RabbitMQ keeping volumes"
-    docker-compose -f "$BASEDIR/docker-compose-rabbitmq.yml" down --remove-orphans
+    docker-compose -f "$BASEDIR/docker-compose-rabbitmq.yml" down
   fi
 
   print_green "RabbitMQ stopped"
@@ -221,10 +221,10 @@ function stop-solr() {
   REMOVE_VOLUME=$(getRemoveVolumeArgumentValue "$@")
   if [ "$REMOVE_VOLUME" == 0 ]; then
     print_red "Stopping Apache Solr removing volumes"
-    docker-compose -f "$BASEDIR/docker-compose-solr.yml" down -v --remove-orphans
+    docker-compose -f "$BASEDIR/docker-compose-solr.yml" down -v
   else
     print_red "Stopping Apache Solr keeping volumes"
-    docker-compose -f "$BASEDIR/docker-compose-solr.yml" down --remove-orphans
+    docker-compose -f "$BASEDIR/docker-compose-solr.yml" down
   fi
 
   print_green "Apache Solr stopped"
@@ -239,10 +239,10 @@ function stop-splunk() {
   REMOVE_VOLUME=$(getRemoveVolumeArgumentValue "$@")
   if [ "$REMOVE_VOLUME" == 0 ]; then
     print_red "Stopping Splunk removing volumes"
-    docker-compose -f "$BASEDIR/docker-compose-splunk.yml" down -v --remove-orphans
+    docker-compose -f "$BASEDIR/docker-compose-splunk.yml" down -v
   else
     print_red "Stopping Splunk keeping volumes"
-    docker-compose -f "$BASEDIR/docker-compose-splunk.yml" down --remove-orphans
+    docker-compose -f "$BASEDIR/docker-compose-splunk.yml" down
   fi
 
   print_green "Splunk stopped"
@@ -257,10 +257,10 @@ function stop-clusterenv() {
   REMOVE_VOLUME=$(getRemoveVolumeArgumentValue "$@")
   if [ "$REMOVE_VOLUME" == 0 ]; then
     print_red "Stopping NiFi Zookeeper and Nginx removing volumes"
-    docker-compose -f "$BASEDIR/docker-compose-nifi-cluster-env.yml" down -v --remove-orphans
+    docker-compose -f "$BASEDIR/docker-compose-nifi-cluster-env.yml" down -v
   else
     print_red "Stopping NiFi Zookeeper and Nginx keeping volumes"
-    docker-compose -f "$BASEDIR/docker-compose-nifi-cluster-env.yml" down --remove-orphans
+    docker-compose -f "$BASEDIR/docker-compose-nifi-cluster-env.yml" down
   fi
 
   print_green "NiFi Zookeeper and Nginx stopped"
