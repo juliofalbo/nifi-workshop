@@ -114,9 +114,6 @@ function stop-nifi() {
 # Function responsible to stop all Services
 #
 function stop-allservices() {
-  #https://github.com/juliofalbo/docker-compose-prometheus-service-discovery
-    "$HOME/workspace/docker-compose-prometheus-service-discovery/docker-prmt-serv-disc.sh" start -f "/Users/jfa/workspace/nifi-workshop/docker-prometheus-sd.yml"
-
   stop-kafka "$@"
   stop-mongo "$@"
   stop-registry "$@"
