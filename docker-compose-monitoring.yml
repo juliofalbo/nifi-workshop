@@ -24,7 +24,7 @@ services:
       - ./grafana/provisioning:/etc/grafana/provisioning
       - ./grafana/config.ini:/etc/grafana/config.ini
       - ./grafana/dashboards:/var/lib/grafana/dashboards
-    environment:
+#    environment:
       # https://grafana.com/plugins/flant-statusmap-panel
       # https://grafana.com/plugins/grafana-piechart-panel
       # https://grafana.com/plugins/grafana-polystat-panel
@@ -32,7 +32,7 @@ services:
       # https://grafana.com/plugins/michaeldmoore-multistat-panel
       # https://grafana.com/plugins/vonage-status-panel
       # https://grafana.com/plugins/yesoreyeram-boomtable-panel
-      GF_INSTALL_PLUGINS: "flant-statusmap-panel,grafana-piechart-panel"
+#      GF_INSTALL_PLUGINS: "flant-statusmap-panel,grafana-piechart-panel"
   prometheus:
     # https://hub.docker.com/r/prom/prometheus/tags
     image: prom/prometheus:v2.18.1
@@ -44,3 +44,4 @@ services:
     volumes:
       - nifi_workshop_prometheus:/prometheus
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./targets.json:/etc/prometheus/targets.json
